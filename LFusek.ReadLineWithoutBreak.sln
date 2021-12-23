@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LFusek.ReadLineWithoutBreak", "LFusek.ReadLineWithoutBreak\LFusek.ReadLineWithoutBreak.csproj", "{3D0129FD-9053-47CF-903A-33915ED6AAB4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{5514D1F6-ED04-4CF4-9B67-3D221F2A9CFE}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		readme.md = readme.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LFusek.ReadLineWithoutBreak.Test", "LFusek.ReadLineWithoutBreak.Test\LFusek.ReadLineWithoutBreak.Test.csproj", "{4C715E55-213C-44B5-B07D-B0A4E5EBBA96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3D0129FD-9053-47CF-903A-33915ED6AAB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D0129FD-9053-47CF-903A-33915ED6AAB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D0129FD-9053-47CF-903A-33915ED6AAB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D0129FD-9053-47CF-903A-33915ED6AAB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C715E55-213C-44B5-B07D-B0A4E5EBBA96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C715E55-213C-44B5-B07D-B0A4E5EBBA96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C715E55-213C-44B5-B07D-B0A4E5EBBA96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C715E55-213C-44B5-B07D-B0A4E5EBBA96}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4DE0213A-54C5-4231-8400-6FDDB79AF3AD}
+	EndGlobalSection
+EndGlobal

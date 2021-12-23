@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <VersionPrefix>1.0.0</VersionPrefix>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Authors>LFusek</Authors>
+        <Copyright>Lukáš Fusek</Copyright>
+        <Product>ReadLineWithoutBreak</Product>
+        <Description>Use ConsoleReader.ReadLineWithoutBreak() to read an input terminated by an Enter key that does not cause a line break.</Description>
+        <RepositoryUrl>https://github.com/LFusek/ReadLineWithoutBreak</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/LFusek/ReadLineWithoutBreak</PackageProjectUrl>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageReadmeFile>readme.md</PackageReadmeFile>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>console;read;readline</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../LICENSE" Link="LICENSE" Pack="True" PackagePath="./" />
+        <None Include="../readme.md" Link="readme.md" Pack="True" PackagePath="./" />
+    </ItemGroup>
+
+</Project>
