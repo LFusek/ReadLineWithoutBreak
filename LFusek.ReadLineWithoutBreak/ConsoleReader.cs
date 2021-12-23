@@ -18,7 +18,6 @@ namespace LFusek.ReadLineWithoutBreak
 				{
 					break;
 				}
-				else if (c.Key == ConsoleKey.LeftWindows || c.Key == ConsoleKey.RightWindows) { }
 				else if (c.Key == ConsoleKey.LeftArrow)
 				{
 					if (startLeft < Console.CursorLeft) Console.CursorLeft--;
@@ -37,97 +36,21 @@ namespace LFusek.ReadLineWithoutBreak
 				}
 				else if (c.Key == ConsoleKey.Backspace)
 				{
-					if (startLeft < Console.CursorLeft)
-					{
-						if (!c.Modifiers.HasFlag(ConsoleModifiers.Control))
-						{
-							string charsToMoveAndCleanWith;
-
-							if (endLeft == Console.CursorLeft)
-							{
-								charsToMoveAndCleanWith = "\0";
-							}
-							else
-							{
-								charsToMoveAndCleanWith = output.ToString(Console.CursorLeft - startLeft, endLeft - Console.CursorLeft);
-								charsToMoveAndCleanWith = charsToMoveAndCleanWith + '\0';
-							}
-
-							output.Remove(Console.CursorLeft - startLeft - 1, 1);
-
-							var currentLeft = --Console.CursorLeft;
-							Console.Write(charsToMoveAndCleanWith);
-							Console.CursorLeft = currentLeft;
-
-							endLeft--;
-						}
-						else
-						{
-							var zeroBasedCurrentLeft = Console.CursorLeft - startLeft;
-							string charsToMoveAndCleanWith;
-
-							if (endLeft == Console.CursorLeft)
-							{
-								charsToMoveAndCleanWith = new string('\0', output.Length);
-							}
-							else
-							{
-								charsToMoveAndCleanWith = output.ToString(zeroBasedCurrentLeft, endLeft - Console.CursorLeft);
-								charsToMoveAndCleanWith = charsToMoveAndCleanWith.PadRight(output.Length, '\0');
-							}
-
-							output.Remove(0, zeroBasedCurrentLeft);
-
-							Console.CursorLeft = startLeft;
-							Console.Write(charsToMoveAndCleanWith);
-							Console.CursorLeft = startLeft;
-
-							endLeft -= zeroBasedCurrentLeft;
-						}
-					}
+					HandleBackspace(c.Modifiers, startLeft, ref endLeft, output);
 				}
 				else if (c.Key == ConsoleKey.Delete)
 				{
-					if (endLeft > Console.CursorLeft)
-					{
-						if (!c.Modifiers.HasFlag(ConsoleModifiers.Control))
-						{
-							var zeroBasedCurrentLeft = Console.CursorLeft - startLeft;
-							var charsToMoveAndCleanWith = output.ToString(zeroBasedCurrentLeft + 1, endLeft - Console.CursorLeft - 1);
-							charsToMoveAndCleanWith = charsToMoveAndCleanWith + '\0';
-
-							output.Remove(zeroBasedCurrentLeft, 1);
-
-							var currentLeft = Console.CursorLeft;
-							Console.Write(charsToMoveAndCleanWith);
-							Console.CursorLeft = currentLeft;
-
-							endLeft--;
-						}
-						else
-						{
-							var lengthOfDeletedChars = endLeft - Console.CursorLeft;
-							var charsToCleanWith = new string('\0', lengthOfDeletedChars);
-
-							output.Remove(Console.CursorLeft - startLeft, lengthOfDeletedChars);
-
-							var currentLeft = Console.CursorLeft;
-							Console.Write(charsToCleanWith);
-							Console.CursorLeft = currentLeft;
-
-							endLeft -= lengthOfDeletedChars;
-						}
-					}
+					HandleDelete(c.Modifiers, startLeft, ref endLeft, output);
 				}
-				else
+				else if (!char.IsControl(c.KeyChar))
 				{
-					var charsToMove = output.ToString(Console.CursorLeft - startLeft, endLeft - Console.CursorLeft);
+					var charsToShift = output.ToString(Console.CursorLeft - startLeft, endLeft - Console.CursorLeft);
 
 					output.Insert(Console.CursorLeft - startLeft, c.KeyChar);
 
 					Console.Write(c.KeyChar);
 					var currentLeft = Console.CursorLeft;
-					Console.Write(charsToMove);
+					Console.Write(charsToShift);
 					Console.CursorLeft = currentLeft;
 
 					endLeft++;
@@ -139,6 +62,141 @@ namespace LFusek.ReadLineWithoutBreak
 			}
 
 			return output.ToString();
+		}
+
+		private static void HandleBackspace(ConsoleModifiers modifiers, int startLeft, ref int endLeft, StringBuilder output)
+		{
+			if (startLeft >= Console.CursorLeft) return;
+
+			var lengthOfCharsOnLeft = Console.CursorLeft - startLeft;
+			var lengthOfCharsOnRight = endLeft - Console.CursorLeft;
+			string charsToShiftAndCleanWith;
+
+			if (!modifiers.HasFlag(ConsoleModifiers.Control))
+			{
+				if (endLeft == Console.CursorLeft)
+				{
+					charsToShiftAndCleanWith = "\0";
+				}
+				else
+				{
+					charsToShiftAndCleanWith = output.ToString(lengthOfCharsOnLeft, lengthOfCharsOnRight);
+					charsToShiftAndCleanWith = charsToShiftAndCleanWith + '\0';
+				}
+
+				output.Remove(lengthOfCharsOnLeft - 1, 1);
+
+				var currentLeft = --Console.CursorLeft;
+				Console.Write(charsToShiftAndCleanWith);
+				Console.CursorLeft = currentLeft;
+
+				endLeft--;
+			}
+			else
+			{
+				int charGroupLength;
+
+				if (endLeft == Console.CursorLeft)
+				{
+					charGroupLength = GetCharGroupLength(output.ToString(), false);
+					charsToShiftAndCleanWith = new string('\0', charGroupLength);
+				}
+				else
+				{
+					charGroupLength = GetCharGroupLength(output.ToString(0, lengthOfCharsOnLeft), false);
+					charsToShiftAndCleanWith = output.ToString(lengthOfCharsOnLeft, lengthOfCharsOnRight);
+					charsToShiftAndCleanWith = charsToShiftAndCleanWith + new string('\0', charGroupLength);
+				}
+
+				output.Remove(lengthOfCharsOnLeft - charGroupLength, charGroupLength);
+
+				Console.CursorLeft -= charGroupLength;
+				var currentLeft = Console.CursorLeft;
+				Console.Write(charsToShiftAndCleanWith);
+				Console.CursorLeft = currentLeft;
+
+				endLeft -= charGroupLength;
+			}
+		}
+
+		private static void HandleDelete(ConsoleModifiers modifiers, int startLeft, ref int endLeft, StringBuilder output)
+		{
+			if (endLeft <= Console.CursorLeft) return;
+
+			var lengthOfCharsOnRight = endLeft - Console.CursorLeft;
+
+			if (!modifiers.HasFlag(ConsoleModifiers.Control))
+			{
+				var lengthOfCharsOnLeft = Console.CursorLeft - startLeft;
+				var charsToShiftAndCleanWith = output.ToString(lengthOfCharsOnLeft + 1, lengthOfCharsOnRight - 1);
+				charsToShiftAndCleanWith = charsToShiftAndCleanWith + '\0';
+
+				output.Remove(lengthOfCharsOnLeft, 1);
+
+				var currentLeft = Console.CursorLeft;
+				Console.Write(charsToShiftAndCleanWith);
+				Console.CursorLeft = currentLeft;
+
+				endLeft--;
+			}
+			else
+			{
+				var charsToCleanWith = new string('\0', lengthOfCharsOnRight);
+
+				output.Remove(Console.CursorLeft - startLeft, lengthOfCharsOnRight);
+
+				var currentLeft = Console.CursorLeft;
+				Console.Write(charsToCleanWith);
+				Console.CursorLeft = currentLeft;
+
+				endLeft -= lengthOfCharsOnRight;
+			}
+		}
+
+		private static int GetCharGroupLength(string text, bool rightDirection)
+		{
+			if (text.Length == 0) return 0;
+
+			int iterationStep;
+			int start;
+			int end;
+
+			if (rightDirection)
+			{
+				iterationStep = 1;
+				start = 0;
+				end = text.Length;
+			}
+			else
+			{
+				iterationStep = -1;
+				start = text.Length - 1;
+				end = -1;
+			}
+
+			if (start == end) return 1;
+
+			var nonSeparatorCharMet = false;
+			var groupLength = 0;
+
+			for (var i = start; i != end; i += iterationStep)
+			{
+				if (!nonSeparatorCharMet)
+				{
+					nonSeparatorCharMet = !char.IsSeparator(text[i]);
+					groupLength++;
+					continue;
+				}
+
+				if (char.IsSeparator(text[i]))
+				{
+					return groupLength;
+				}
+
+				groupLength++;
+			}
+
+			return groupLength;
 		}
 	}
 }
